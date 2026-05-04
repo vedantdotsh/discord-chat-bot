@@ -1,22 +1,14 @@
-# Discord Server Guide - OrbitGuild Community
+# Discord Server Setup Notes
 
-This guide describes a fictional Discord server for OrbitGuild Labs.
+## Discord Developer Portal
 
-## Channels
+1. Create an application.
+2. Add a bot user.
+3. Enable the Message Content Intent.
+4. Invite the bot with permissions to read messages, send messages, and use embeds if you add richer output later.
 
-- **#announcements** - Official fictional updates and event notices.
-- **#general** - Community chat.
-- **#help** - Ask questions about events, quests, and server rules.
-- **#questline** - Campaign and challenge discussion.
-- **#feedback** - Suggestions for moderators.
+The bot does not require the privileged Members intent.
 
-## Roles
+## Channel Allowlist
 
-- **Founder** - Demo server owner.
-- **Moderator** - Keeps the server organized and safe.
-- **Quest Host** - Runs fictional community events.
-- **Member** - Regular participant.
-
-## Support
-
-For help, ask in `#help` or mention the assistant with a clear question.
+Use `ALLOWED_CHANNEL_IDS` for real servers because channel names can change. Keep `ALLOWED_CHANNELS` only for demos or local testing.

@@ -1,19 +1,37 @@
-﻿# Discord AI Bot
+# Discord AI Bot
 
-Discord AI assistant for a fictional OrbitGuild Labs community. The bot answers Discord questions, uses a local Markdown knowledge bank for OrbitGuild context, remembers short channel history, can search the web, and can fetch live crypto prices.
+A Python Discord assistant that answers explicit user questions, uses a Markdown knowledge bank for community-specific context, searches the web for current information, and fetches live crypto prices.
 
-## Features
+This is portfolio work focused on practical bot engineering: command routing, provider integration, tool calling, local knowledge loading, rate limiting, and deployment hygiene.
 
-- Discord message handling with `!ask`, mentions, `!ping`, `!knowledge`, `!clear`, and `!help`
-- OpenRouter chat completions through the OpenAI Python SDK
-- Local knowledge bank loaded from `knowledge/*.md`
-- DuckDuckGo search with Tavily fallback
-- CoinGecko crypto price lookups
-- Per-channel in-memory conversation history
+## Highlights
+
+- Responds only to `!ask`, direct mentions, and built-in commands, so it does not interrupt normal chat.
+- Uses OpenRouter through the OpenAI Python SDK.
+- Loads local Markdown knowledge from `knowledge/*.md`.
+- Provides DuckDuckGo search with optional Tavily fallback.
+- Fetches live crypto prices from CoinGecko.
+- Keeps short per-channel conversation memory.
+- Supports channel allowlists by Discord channel ID or channel name.
+
+## Commands
+
+- `!ask <question>` - Ask the AI assistant.
+- `@BotName <question>` - Ask by mentioning the bot.
+- `!ping` - Show latency, model, tools, and memory stats.
+- `!knowledge` - List loaded knowledge files.
+- `!clear` - Reset memory for the current channel.
+- `!help` - Show available commands.
 
 ## Setup
 
-1. Create a virtual environment.
+1. Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
 2. Install dependencies:
 
 ```bash
@@ -23,25 +41,42 @@ pip install -r requirements.txt
 3. Copy the example environment file:
 
 ```bash
-cp .env.example .env
+copy .env.example .env
 ```
 
 4. Fill in the required values in `.env`.
+
 5. Start the bot:
 
 ```bash
 python bot.py
 ```
 
+## Configuration
+
+Required:
+
+- `DISCORD_TOKEN` - Discord bot token.
+- `OPENROUTER_API_KEY` - OpenRouter API key.
+
+Optional:
+
+- `ALLOWED_CHANNEL_IDS` - Comma-separated Discord channel IDs. Recommended for real servers.
+- `ALLOWED_CHANNELS` - Comma-separated channel names for local demos.
+- `COMMAND_PREFIX` - Defaults to `!ask`.
+- `OPENROUTER_MODEL` - Defaults to `deepseek/deepseek-v3-base:free`.
+- `TAVILY_API_KEY` - Optional fallback search provider.
+- `MAX_HISTORY`, `MAX_TOKENS`, `MAX_KNOWLEDGE_CHARS`, `RATE_LIMIT_SECONDS`.
+
 ## Knowledge Bank
 
-Add or update Markdown files in `knowledge/`. Files are loaded alphabetically, so numbered filenames like `01_orbitguild_project.md` and `02_discord_server.md` keep context in a predictable order.
+Add or update Markdown files in `knowledge/`. Files load alphabetically, so numbered names like `01_project.md` and `02_server_rules.md` keep context predictable.
 
 ## Repository Layout
 
 - `bot.py` - Discord client and command handling
 - `config.py` - environment-based settings
-- `groq_client.py` - OpenRouter client and tool-calling loop
+- `ai_client.py` - OpenRouter client and tool-calling loop
 - `search.py` - web search and crypto price tools
 - `memory.py` - per-channel chat history
 - `knowledge_loader.py` - Markdown knowledge loader
@@ -53,3 +88,8 @@ Add or update Markdown files in `knowledge/`. Files are loaded alphabetically, s
 
 Never commit `.env`, logs, caches, or local virtual environments. The `.gitignore` file is set up to keep secrets and generated files out of git.
 
+For production Discord servers, prefer `ALLOWED_CHANNEL_IDS` over channel names and rotate any token that has ever been shared outside your private environment.
+
+## Portfolio Notes
+
+Good next upgrades would be slash commands, persistent memory, tests around Discord event routing, and a deployment guide for a small VPS or container host.

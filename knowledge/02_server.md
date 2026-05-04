@@ -1,13 +1,13 @@
-# OrbitGuild Discord Server Knowledge
+# Discord Server Knowledge
 
-The fictional OrbitGuild Discord server is organized around community events, support, and creator collaboration.
+The demo Discord server is organized around announcements, support, discussion, and community feedback.
 
 ## Main Channels
 
-- **#announcements**: Official fictional updates.
+- **#announcements**: Official updates.
 - **#general**: Open discussion.
 - **#help**: Support questions.
-- **#questline**: Event and challenge coordination.
+- **#events**: Event and challenge coordination.
 - **#feedback**: Suggestions for improving the server.
 
 ## Rules
@@ -15,7 +15,7 @@ The fictional OrbitGuild Discord server is organized around community events, su
 - Be respectful.
 - Keep support requests clear and specific.
 - Do not share private tokens, passwords, or API keys.
-- Treat OrbitGuild as fictional demo content unless a maintainer says otherwise.
+- Keep support and moderation discussions inside the right channels.
 
 ## Bot Usage
 
