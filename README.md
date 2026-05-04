@@ -1,4 +1,4 @@
-﻿# OrbitGuild Discord AI Bot
+﻿# Discord AI Bot
 
 Discord AI assistant for a fictional OrbitGuild Labs community. The bot answers Discord questions, uses a local Markdown knowledge bank for OrbitGuild context, remembers short channel history, can search the web, and can fetch live crypto prices.
 
