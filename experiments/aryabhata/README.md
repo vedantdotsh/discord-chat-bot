@@ -16,7 +16,7 @@ Plots and `summary.json` land in `experiments/aryabhata/results/`.
 
 ## What is compared
 
-- **Sine, from a rule.** His printed table and, separately, the raw second-difference loop with divisor 225. Those are not the same: the loop drifts by about a degree, and the 24 integers he published stay inside one arcminute. The same loop with the modern from-scratch constant `h^2` is also scored, along with the Madhava/Taylor series and CORDIC. `math.sin` is the reference, not a contestant.
+- **Sine, from a rule.** His printed table, a modern 24-entry table with the same arcminute rounding, and the raw second-difference loop with divisor 225. The loop is not the table: it drifts by about a degree, and the 24 integers he published stay inside one arcminute. The same loop with the modern from-scratch constant `h^2` is also scored, along with the Madhava/Taylor series and CORDIC. `math.sin` is the reference, not a contestant.
 - **Sine, from samples.** A 1-parameter fit of his curvature, a 2-parameter fit, odd polynomials, linear interpolation, and an 8-unit tanh network (25 parameters). Training angles are an even grid. Test angles are the integer degrees left out.
 - **Extrapolation.** The same learners, trained only up to 60°, scored from 61° to 90°.
 - **Pi.** `62832/20000` against `22/7`, `355/113`, and `math.pi`, on a circle of diameter 20000 (his own statement of the verse).

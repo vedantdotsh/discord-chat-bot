@@ -39,6 +39,7 @@ from experiments.aryabhata.jya import (
     aryabhata_pi,
     aryabhata_unit_sines,
     modern_jya,
+    modern_rounded_jya,
     oracle_alpha,
     oracle_unit_sines,
     published_jya,
@@ -68,6 +69,8 @@ MLP_HIDDEN = 8
 
 _COLORS = {
     "Aryabhata printed table": "#9a3412",
+    "Modern 24-entry table": "#0f766e",
+    "Frozen modern 24-entry table": "#0f766e",
     "Aryabhata recurrence": "#c2410c",
     "Small-angle recurrence h^2": "#b45309",
     "Power series, 3 terms": "#0f766e",
@@ -117,6 +120,12 @@ def formula_report() -> list[dict]:
             "Gitikapada 12, the 24 integers he published",
             24,
             np.array(published_jya(), dtype=float) / RADIUS_ARCMINUTES,
+        ),
+        (
+            "Modern 24-entry table",
+            "Same 24 nodes and arcminute rounding, filled from math.sin",
+            24,
+            np.array(modern_rounded_jya(), dtype=float) / RADIUS_ARCMINUTES,
         ),
         (
             "Aryabhata recurrence",
@@ -246,6 +255,8 @@ def _score_learners(
     native_deg = np.concatenate([[0.0], np.arange(1, 25) * 3.75])
     native_y = np.concatenate([[0.0], np.array(published_jya(), dtype=float) / RADIUS_ARCMINUTES])
     frozen_table = np.interp(test_deg.astype(float), native_deg, native_y)
+    modern_y = np.concatenate([[0.0], np.array(modern_rounded_jya(), dtype=float) / RADIUS_ARCMINUTES])
+    frozen_modern = np.interp(test_deg.astype(float), native_deg, modern_y)
 
     return {
         "train_size": int(len(train_deg)),
@@ -265,6 +276,7 @@ def _score_learners(
         "mlp_q75": float(np.quantile(mlp_maes_arr, 0.75)),
         "Frozen h^2 recurrence": _finite_mae(frozen_h2, truth),
         "Frozen Aryabhata table": _finite_mae(frozen_table, truth),
+        "Frozen modern 24-entry table": _finite_mae(frozen_modern, truth),
     }
 
 
@@ -459,6 +471,7 @@ def _plot_errors(formulas: list[dict], path: Path) -> None:
 def _plot_learning(rows: list[dict], path: Path) -> None:
     methods = [
         "Frozen Aryabhata table",
+        "Frozen modern 24-entry table",
         "Frozen h^2 recurrence",
         "Learned curvature (1 param)",
         "Learned curvature and start (2 params)",
@@ -495,6 +508,7 @@ def _plot_learning(rows: list[dict], path: Path) -> None:
 def _plot_extrapolation(row: dict, path: Path) -> None:
     names = [
         "Frozen Aryabhata table",
+        "Frozen modern 24-entry table",
         "Frozen h^2 recurrence",
         "Learned curvature (1 param)",
         "Learned curvature and start (2 params)",
@@ -539,9 +553,14 @@ def _clean(value):
 
 
 def build_summary(mlp_seeds: int = MLP_SEEDS, mlp_steps: int = MLP_STEPS, kuttaka_trials: int = 400) -> dict:
+    started = time.perf_counter()
     formulas = formula_report()
     learning = learning_report(mlp_seeds=mlp_seeds, mlp_steps=mlp_steps)
     extra = extrapolation_report(mlp_seeds=mlp_seeds, mlp_steps=mlp_steps)
+    pi = pi_report()
+    kuttaka = kuttaka_report(kuttaka_trials)
+    roots = sqrt_report()
+    sums = sums_report()
     summary = {
         "ground_truth": "math.sin, math.pi, math.isqrt",
         "native_step_degrees": 3.75,
@@ -551,14 +570,15 @@ def build_summary(mlp_seeds: int = MLP_SEEDS, mlp_steps: int = MLP_STEPS, kuttak
         "oracle_alpha_native_step": oracle_alpha(math.pi / 48),
         "small_angle_alpha_native_step": small_angle_alpha(math.pi / 48),
         "aryabhata_alpha_native_step": 1 / 225,
+        "runtime_seconds": time.perf_counter() - started,
         "mlp": {"hidden": MLP_HIDDEN, "steps": mlp_steps, "seeds": mlp_seeds, "parameters": 1 * MLP_HIDDEN + MLP_HIDDEN + MLP_HIDDEN + 1},
         "sine_formulas": _strip_arrays(formulas),
         "sample_efficiency": learning,
         "extrapolation": {key: value for key, value in extra.items()},
-        "pi": pi_report(),
-        "kuttaka": kuttaka_report(kuttaka_trials),
-        "square_roots": sqrt_report(),
-        "sums": sums_report(),
+        "pi": pi,
+        "kuttaka": kuttaka,
+        "square_roots": roots,
+        "sums": sums,
     }
     summary["_plot_cache"] = {"formulas": formulas, "learning": learning, "extrapolation": extra}
     return summary

@@ -80,6 +80,14 @@ def modern_jya(radius: float = RADIUS_ARCMINUTES, steps: int = NATIVE_STEPS) -> 
     return [radius * math.sin(k * math.pi / (2 * steps)) for k in range(1, steps + 1)]
 
 
+def modern_rounded_jya(radius: int = RADIUS_ARCMINUTES, steps: int = NATIVE_STEPS) -> list[int]:
+    """Same 24 nodes and arcminute precision as the printed table, filled by rounding math.sin.
+
+    This is the lookup-table control: same size, same unit, current values.
+    """
+    return [int(round(value)) for value in modern_jya(radius, steps)]
+
+
 def rollout(steps: int, alpha: float, delta0: float) -> list[float]:
     """Second-difference recurrence. s grows by delta, delta shrinks by alpha*s.
 

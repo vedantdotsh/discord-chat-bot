@@ -7,6 +7,7 @@
   "oracle_alpha_native_step": 0.0042821535227929855,
   "small_angle_alpha_native_step": 0.004283682465750589,
   "aryabhata_alpha_native_step": 0.0044444444444444444,
+  "runtime_seconds": 10.54394124800001,
   "mlp": {
     "hidden": 8,
     "steps": 6000,
@@ -23,6 +24,17 @@
       "node_max_arcmin": 0.7021672261960132,
       "grid_mae": 0.00019283096886015826,
       "grid_max": 0.0004899018998367755,
+      "grid_note": "Off-node values are linear interpolation between the 3.75\u00b0 nodes."
+    },
+    {
+      "name": "Modern 24-entry table",
+      "source": "Same 24 nodes and arcminute rounding, filled from math.sin",
+      "stored_numbers": 24,
+      "node_mae": 6.847838250648049e-05,
+      "node_max": 0.00013211599645923666,
+      "node_max_arcmin": 0.45421479582685564,
+      "grid_mae": 0.00020219374877252053,
+      "grid_max": 0.0005953604635123844,
       "grid_note": "Off-node values are linear interpolation between the 3.75\u00b0 nodes."
     },
     {
@@ -132,7 +144,8 @@
       "mlp_q25": 0.05990026732895145,
       "mlp_q75": 0.11344784216197247,
       "Frozen h^2 recurrence": 2.89636328441415e-05,
-      "Frozen Aryabhata table": 0.000192286806524507
+      "Frozen Aryabhata table": 0.000192286806524507,
+      "Frozen modern 24-entry table": 0.0002009286850470285
     },
     {
       "train_size": 4,
@@ -151,7 +164,8 @@
       "mlp_q25": 0.00584217401928152,
       "mlp_q75": 0.010376231268188795,
       "Frozen h^2 recurrence": 2.8889012254578632e-05,
-      "Frozen Aryabhata table": 0.00019468562932499378
+      "Frozen Aryabhata table": 0.00019468562932499378,
+      "Frozen modern 24-entry table": 0.0002042260024779162
     },
     {
       "train_size": 6,
@@ -170,7 +184,8 @@
       "mlp_q25": 0.0013873077097602414,
       "mlp_q75": 0.003729893429404376,
       "Frozen h^2 recurrence": 2.8875126265680407e-05,
-      "Frozen Aryabhata table": 0.00019059455876392644
+      "Frozen Aryabhata table": 0.00019059455876392644,
+      "Frozen modern 24-entry table": 0.0001996431139228019
     },
     {
       "train_size": 8,
@@ -189,7 +204,8 @@
       "mlp_q25": 0.0012324383911094378,
       "mlp_q75": 0.0032974463219659998,
       "Frozen h^2 recurrence": 2.8864547487016206e-05,
-      "Frozen Aryabhata table": 0.00018926048346527182
+      "Frozen Aryabhata table": 0.00018926048346527182,
+      "Frozen modern 24-entry table": 0.00019805564868473764
     },
     {
       "train_size": 12,
@@ -208,7 +224,8 @@
       "mlp_q25": 0.0012182302034733031,
       "mlp_q75": 0.002952664098532726,
       "Frozen h^2 recurrence": 2.8865229605556765e-05,
-      "Frozen Aryabhata table": 0.0001954730818743552
+      "Frozen Aryabhata table": 0.0001954730818743552,
+      "Frozen modern 24-entry table": 0.00020447249746804866
     },
     {
       "train_size": 18,
@@ -227,7 +244,8 @@
       "mlp_q25": 0.0012997778057535988,
       "mlp_q75": 0.002800006086604547,
       "Frozen h^2 recurrence": 2.886288570701171e-05,
-      "Frozen Aryabhata table": 0.0001926371981720388
+      "Frozen Aryabhata table": 0.0001926371981720388,
+      "Frozen modern 24-entry table": 0.00020077775818769182
     },
     {
       "train_size": 30,
@@ -246,7 +264,8 @@
       "mlp_q25": 0.002012949491823023,
       "mlp_q75": 0.003916061033875229,
       "Frozen h^2 recurrence": 2.8861535121041358e-05,
-      "Frozen Aryabhata table": 0.00019021598630216216
+      "Frozen Aryabhata table": 0.00019021598630216216,
+      "Frozen modern 24-entry table": 0.00019748861011052856
     }
   ],
   "extrapolation": {
@@ -267,6 +286,7 @@
     "mlp_q75": 0.03274475219757242,
     "Frozen h^2 recurrence": 4.030883880433711e-05,
     "Frozen Aryabhata table": 0.00024026450098782644,
+    "Frozen modern 24-entry table": 0.00032261458993463704,
     "train_degrees": [
       0,
       5,
@@ -338,8 +358,8 @@
       "euclid_checks": true
     },
     "mean_seconds_60_digit": {
-      "kuttaka": 3.261146666773129e-05,
-      "extended_euclid": 2.988223332825631e-05
+      "kuttaka": 2.6141766670662037e-05,
+      "extended_euclid": 2.2442500001792116e-05
     },
     "note": "Same divisions, same gcd, both identities check out. Kuttaka is the extended Euclidean algorithm written as a quotient column."
   },
@@ -351,8 +371,8 @@
       "aryabhata_digit_pair_steps": 4,
       "aryabhata_digit_trials": 4,
       "newton_iterations": 5,
-      "aryabhata_seconds": 9.214999863615958e-06,
-      "newton_seconds": 2.733999963311362e-06
+      "aryabhata_seconds": 8.07099991106952e-06,
+      "newton_seconds": 2.5809999897319358e-06
     },
     {
       "digits": 40,
@@ -361,8 +381,8 @@
       "aryabhata_digit_pair_steps": 20,
       "aryabhata_digit_trials": 20,
       "newton_iterations": 7,
-      "aryabhata_seconds": 1.3588999991043238e-05,
-      "newton_seconds": 3.54400003743649e-06
+      "aryabhata_seconds": 1.2755000170727726e-05,
+      "newton_seconds": 3.2279999686579686e-06
     },
     {
       "digits": 200,
@@ -371,8 +391,8 @@
       "aryabhata_digit_pair_steps": 100,
       "aryabhata_digit_trials": 100,
       "newton_iterations": 10,
-      "aryabhata_seconds": 5.447300009109313e-05,
-      "newton_seconds": 6.686999995508813e-06
+      "aryabhata_seconds": 4.919900015920575e-05,
+      "newton_seconds": 5.8910000007017516e-06
     },
     {
       "digits": 800,
@@ -381,8 +401,8 @@
       "aryabhata_digit_pair_steps": 400,
       "aryabhata_digit_trials": 400,
       "newton_iterations": 11,
-      "aryabhata_seconds": 0.00025674399989839003,
-      "newton_seconds": 3.390000006220362e-05
+      "aryabhata_seconds": 0.0002458010001191724,
+      "newton_seconds": 3.393199995116447e-05
     }
   ],
   "sums": {

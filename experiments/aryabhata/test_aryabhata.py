@@ -22,6 +22,7 @@ from experiments.aryabhata.jya import (
     RADIUS_ARCMINUTES,
     aryabhata_pi,
     modern_jya,
+    modern_rounded_jya,
     oracle_alpha,
     oracle_unit_sines,
     published_jya,
@@ -53,6 +54,13 @@ class JyaTests(unittest.TestCase):
         truth = modern_jya()
         worst = max(abs(pred - got) for pred, got in zip(published_jya(), truth))
         self.assertLess(worst, 1.0)
+
+    def test_same_size_modern_table_rounds_within_half_an_arcminute(self):
+        truth = modern_jya()
+        rounded = modern_rounded_jya()
+        self.assertEqual(len(rounded), len(published_jya()))
+        worst = max(abs(pred - got) for pred, got in zip(rounded, truth))
+        self.assertLessEqual(worst, 0.5)
 
     def test_thirty_degrees_is_half_the_radius(self):
         # 30 degrees is the 8th node (index 7): 3438 * sin(30 deg) = 1719 exactly.
