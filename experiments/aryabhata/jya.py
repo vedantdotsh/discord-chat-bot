@@ -66,11 +66,11 @@ def radius_from_pi(pi: float | None = None) -> float:
 
 
 def rsine_length_arcmin(pred_unit: float, true_unit: float, radius: float = RADIUS_ARCMINUTES) -> float:
-    """Error in the Rsine length, in the arcminute unit the table is written in.
+    """Scaled sine-coordinate error, |prediction - sin| times the radius.
 
-    jya is a length, R*sin(theta), not an angle. A residual of 1 here means
-    the half-chord is one arcminute of length short or long on a radius of
-    `radius`. It is not automatically an error of one arcminute of angle.
+    The printed table stores integers on a radius of 3438, so this product
+    is in that coordinate. It is not an angle in arcminutes. Angle error is
+    `angle_error_arcmin`.
     """
     return abs(pred_unit - true_unit) * radius
 

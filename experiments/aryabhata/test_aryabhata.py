@@ -165,6 +165,74 @@ class SumTests(unittest.TestCase):
         self.assertGreater(abs(predict_polynomial(400, quadratic) - sum_squares(400)), 10_000)
 
 
+class RobustnessTests(unittest.TestCase):
+    def test_even_grid_has_multiple_exact_frequencies(self):
+        from experiments.aryabhata.robustness import (
+            EVEN_TRAIN,
+            HELD_OUT,
+            family_start,
+            train_loss,
+        )
+
+        clean = np.sin(np.deg2rad(np.array(EVEN_TRAIN, dtype=float)))
+        true_alpha, true_delta = family_start(math.pi / 180.0)
+        alias_alpha, alias_delta = family_start(math.pi / 180.0 + 2.0 * math.pi / 30.0)
+        true_loss = train_loss(true_alpha, true_delta, EVEN_TRAIN, clean)
+        alias_loss = train_loss(alias_alpha, alias_delta, EVEN_TRAIN, clean)
+        self.assertLess(true_loss, 1e-20)
+        self.assertLess(alias_loss, 1e-20)
+
+        from experiments.aryabhata.robustness import score_pair
+
+        true_held = score_pair(true_alpha, true_delta)["heldout_integer_mae"]
+        alias_held = score_pair(alias_alpha, alias_delta)["heldout_integer_mae"]
+        self.assertLess(true_held, 1e-8)
+        self.assertGreater(alias_held, 0.05)
+        self.assertEqual(len(HELD_OUT), 91 - 6)
+
+    def test_selection_ignores_test_error(self):
+        from experiments.aryabhata.robustness import select_index
+
+        rows = [
+            {"train_loss_after": 0.2, "heldout_integer_mae": 0.0},
+            {"train_loss_after": 0.1, "heldout_integer_mae": 0.9},
+            {"train_loss_after": 0.1, "heldout_integer_mae": 0.0},
+        ]
+        self.assertEqual(select_index(rows), 1)
+
+    def test_float_dust_is_a_tie_and_keeps_the_earlier_start(self):
+        from experiments.aryabhata.robustness import select_index, tie_indices
+
+        rows = [
+            {"train_loss_after": 6.412629048297546e-10, "heldout_integer_mae": 1e-5},
+            {"train_loss_after": 6.412629048285401e-10, "heldout_integer_mae": 0.8},
+            {"train_loss_after": 6.412629048285401e-10 + 1e-6, "heldout_integer_mae": 0.0},
+        ]
+        self.assertEqual(tie_indices(rows), [0, 1])
+        self.assertEqual(select_index(rows), 0)
+
+    def test_half_degree_is_labeled_interpolation(self):
+        from experiments.aryabhata.jya import rollout
+        from experiments.aryabhata.robustness import interpolate_half_degrees
+
+        alpha, delta0 = (0.01, 0.02)
+        seq = [0.0, *rollout(90, alpha, delta0)]
+        half = interpolate_half_degrees(seq)
+        self.assertAlmostEqual(half[0], 0.5 * (seq[0] + seq[1]), places=12)
+        self.assertNotAlmostEqual(half[0], seq[0], places=6)
+
+    def test_irregular_grid_breaks_the_alias(self):
+        from experiments.aryabhata.robustness import IRREGULAR_TRAIN, family_start, train_loss
+
+        clean = np.sin(np.deg2rad(np.array(IRREGULAR_TRAIN, dtype=float)))
+        true_alpha, true_delta = family_start(math.pi / 180.0)
+        alias_alpha, alias_delta = family_start(math.pi / 180.0 + 2.0 * math.pi / 30.0)
+        true_loss = train_loss(true_alpha, true_delta, IRREGULAR_TRAIN, clean)
+        alias_loss = train_loss(alias_alpha, alias_delta, IRREGULAR_TRAIN, clean)
+        self.assertLess(true_loss, 1e-20)
+        self.assertGreater(alias_loss, 1e-4)
+
+
 class LearnerTests(unittest.TestCase):
     def test_series_and_cordic_near_thirty_degrees(self):
         theta = math.pi / 6

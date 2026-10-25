@@ -626,12 +626,13 @@ def build_summary(mlp_seeds: int = MLP_SEEDS, mlp_steps: int = MLP_STEPS, kuttak
         "ground_truth": "math.sin, math.pi, math.isqrt",
         "error_definitions": {
             "max_rsine_length_arcmin": (
-                "Absolute error in the Rsine length, |prediction - sin(theta)| * 3438. "
-                "The table's unit is an arcminute of length along the radius, not an angle."
+                "Scaled sine-coordinate error, |prediction - sin(theta)| * 3438. "
+                "Not an angle in arcminutes. The separate max_angle_arcmin field is the angle."
             ),
             "max_angle_arcmin": (
-                "Absolute error in the recovered angle, |arcsin(clip(prediction)) - theta| "
-                "converted to arcminutes. This is the angular error."
+                "Absolute error in the recovered angle, |arcsin(prediction) - theta| "
+                "converted to arcminutes. Predictions outside [-1, 1] are rejected, "
+                "not clipped. This is the angular error."
             ),
             "learning_mae": (
                 "Mean |prediction - sin(theta)| on held-out degrees. Dimensionless. "

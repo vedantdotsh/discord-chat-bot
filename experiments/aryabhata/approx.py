@@ -159,9 +159,11 @@ def predict_mlp(angles: np.ndarray, weights: MLPWeights) -> np.ndarray:
 
 
 def predict_recurrence(degree_steps: np.ndarray, alpha: float, delta0: float) -> np.ndarray:
-    """Sine at k * h, where h is whatever step delta0 and alpha were built for.
+    """Sine at integer steps k, where h is the step delta0 and alpha were built for.
 
-    degree_steps are the integer step counts k, not radians.
+    degree_steps are cast with int(). A half-degree such as 0.5 becomes 0.
+    That path is integer-grid-only. Half-degree scores belong in robustness.py,
+    which interpolates and labels the interpolation.
     """
     cached: dict[int, float] = {0: 0.0}
     out = np.empty(len(degree_steps), dtype=float)
