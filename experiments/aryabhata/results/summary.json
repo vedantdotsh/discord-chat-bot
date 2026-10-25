@@ -1,0 +1,417 @@
+{
+  "ground_truth": "math.sin, math.pi, math.isqrt",
+  "native_step_degrees": 3.75,
+  "radius_arcminutes": 3438,
+  "radius_from_his_pi": 3437.7387318563788,
+  "modern_jya_at_30deg": 1718.9999999999998,
+  "oracle_alpha_native_step": 0.0042821535227929855,
+  "small_angle_alpha_native_step": 0.004283682465750589,
+  "aryabhata_alpha_native_step": 0.0044444444444444444,
+  "mlp": {
+    "hidden": 8,
+    "steps": 6000,
+    "seeds": 7,
+    "parameters": 25
+  },
+  "sine_formulas": [
+    {
+      "name": "Aryabhata printed table",
+      "source": "Gitikapada 12, the 24 integers he published",
+      "stored_numbers": 24,
+      "node_mae": 8.33247338255227e-05,
+      "node_max": 0.0002042371222210626,
+      "node_max_arcmin": 0.7021672261960132,
+      "grid_mae": 0.00019283096886015826,
+      "grid_max": 0.0004899018998367755,
+      "grid_note": "Off-node values are linear interpolation between the 3.75\u00b0 nodes."
+    },
+    {
+      "name": "Aryabhata recurrence",
+      "source": "Same loop, his constants: start at the arc, divide by 225",
+      "stored_numbers": 0,
+      "node_mae": 0.005149054596335999,
+      "node_max": 0.01820613863828946,
+      "node_max_arcmin": 62.59270463843916,
+      "grid_mae": 0.0049917760439086994,
+      "grid_max": 0.018213379903745497,
+      "grid_note": "Off-node values are linear interpolation between the 3.75\u00b0 nodes."
+    },
+    {
+      "name": "Small-angle recurrence h^2",
+      "source": "Same loop, modern from-scratch constant alpha = h^2",
+      "stored_numbers": 0,
+      "node_mae": 0.0004170090478249055,
+      "node_max": 0.000578846054819393,
+      "node_max_arcmin": 1.9900727364690731,
+      "grid_mae": 0.00017982758308237454,
+      "grid_max": 0.000578846054819393,
+      "grid_note": "Off-node values are linear interpolation between the 3.75\u00b0 nodes."
+    },
+    {
+      "name": "Exact difference identity",
+      "source": "Same loop with math.sin baked into the constants. A ceiling, not a method.",
+      "stored_numbers": 0,
+      "node_mae": 5.3198186596622086e-17,
+      "node_max": 1.1102230246251565e-16,
+      "node_max_arcmin": 3.816946758661288e-13,
+      "grid_mae": 5.775043416700628e-17,
+      "grid_max": 2.220446049250313e-16,
+      "grid_note": "Evaluated directly. Constants come from math.sin, so this is a ceiling, not a method."
+    },
+    {
+      "name": "Power series, 3 terms",
+      "source": "Madhava c. 1400, Taylor 1715. Same coefficients.",
+      "stored_numbers": 0,
+      "node_mae": 0.0006682731349077301,
+      "node_max": 0.004524855534817407,
+      "node_max_arcmin": 15.556453328702245,
+      "grid_mae": 0.0005741807717959953,
+      "grid_max": 0.004524855534817407,
+      "grid_note": "Evaluated at each angle. No table interpolation."
+    },
+    {
+      "name": "Power series, 5 terms",
+      "source": "Madhava c. 1400, Taylor 1715. Same coefficients.",
+      "stored_numbers": 0,
+      "node_mae": 3.752902939206428e-07,
+      "node_max": 3.542584286142514e-06,
+      "node_max_arcmin": 0.012179404775757963,
+      "grid_mae": 2.999911627116703e-07,
+      "grid_max": 3.542584286142514e-06,
+      "grid_note": "Evaluated at each angle. No table interpolation."
+    },
+    {
+      "name": "Power series, 7 terms",
+      "source": "Madhava c. 1400, Taylor 1715. Same coefficients.",
+      "stored_numbers": 0,
+      "node_mae": 5.670239682879311e-11,
+      "node_max": 6.627802751069112e-10,
+      "node_max_arcmin": 2.2786385858175606e-06,
+      "grid_mae": 4.2274835498674284e-11,
+      "grid_max": 6.627802751069112e-10,
+      "grid_note": "Evaluated at each angle. No table interpolation."
+    },
+    {
+      "name": "CORDIC, 8 shifts",
+      "source": "Current shift-add method. Auxiliary table of arctangents, no sine table.",
+      "stored_numbers": 8,
+      "node_mae": 0.002403298507974464,
+      "node_max": 0.00679703533284276,
+      "node_max_arcmin": 23.368207474313408,
+      "grid_mae": 0.0024699451390564156,
+      "grid_max": 0.00771630268225448,
+      "grid_note": "Evaluated at each angle. No table interpolation."
+    },
+    {
+      "name": "CORDIC, 16 shifts",
+      "source": "Current shift-add method. Auxiliary table of arctangents, no sine table.",
+      "stored_numbers": 16,
+      "node_mae": 8.98360475303818e-06,
+      "node_max": 2.5660993476839256e-05,
+      "node_max_arcmin": 0.08822249557337336,
+      "grid_mae": 9.798730031335764e-06,
+      "grid_max": 3.0060275025802635e-05,
+      "grid_note": "Evaluated at each angle. No table interpolation."
+    }
+  ],
+  "sample_efficiency": [
+    {
+      "train_size": 2,
+      "test_size": 89,
+      "learned_alpha": 0.0003046406193258379,
+      "learned_alpha_2": 0.0003046406180240616,
+      "learned_delta0": 0.017453292482651227,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.13813848387252586,
+      "Learned curvature (1 param)": 1.865630208544644e-05,
+      "Learned curvature and start (2 params)": 1.865551691211142e-05,
+      "Odd polynomial, 3 terms": 0.3347399546849021,
+      "Odd polynomial, 5 terms": 0.412807650731631,
+      "MLP, 8 hidden units": 0.10136085522606456,
+      "mlp_q25": 0.05990026732895145,
+      "mlp_q75": 0.11344784216197247,
+      "Frozen h^2 recurrence": 2.89636328441415e-05,
+      "Frozen Aryabhata table": 0.000192286806524507
+    },
+    {
+      "train_size": 4,
+      "test_size": 87,
+      "learned_alpha": 0.00030464615646967093,
+      "learned_alpha_2": 0.00030460968721752243,
+      "learned_delta0": 0.01745240643728352,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.015098424725536137,
+      "Learned curvature (1 param)": 1.6539352587772677e-05,
+      "Learned curvature and start (2 params)": 1.162065335401475e-16,
+      "Odd polynomial, 3 terms": 5.470005847362748e-05,
+      "Odd polynomial, 5 terms": 0.00431491772021919,
+      "MLP, 8 hidden units": 0.006386004553929623,
+      "mlp_q25": 0.00584217401928152,
+      "mlp_q75": 0.010376231268188795,
+      "Frozen h^2 recurrence": 2.8889012254578632e-05,
+      "Frozen Aryabhata table": 0.00019468562932499378
+    },
+    {
+      "train_size": 6,
+      "test_size": 85,
+      "learned_alpha": 0.0003046496050664278,
+      "learned_alpha_2": 0.0003046096872175246,
+      "learned_delta0": 0.017452406437283574,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.00553601685387547,
+      "Learned curvature (1 param)": 1.581047817550504e-05,
+      "Learned curvature and start (2 params)": 1.1880202703948459e-15,
+      "Odd polynomial, 3 terms": 4.703547927697563e-05,
+      "Odd polynomial, 5 terms": 4.274025616022564e-09,
+      "MLP, 8 hidden units": 0.002446072676268382,
+      "mlp_q25": 0.0013873077097602414,
+      "mlp_q75": 0.003729893429404376,
+      "Frozen h^2 recurrence": 2.8875126265680407e-05,
+      "Frozen Aryabhata table": 0.00019059455876392644
+    },
+    {
+      "train_size": 8,
+      "test_size": 83,
+      "learned_alpha": 0.0003046515271150653,
+      "learned_alpha_2": 0.0003046096872175187,
+      "learned_delta0": 0.017452406437283463,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.002881609632460472,
+      "Learned curvature (1 param)": 1.557570641266579e-05,
+      "Learned curvature and start (2 params)": 9.472844195803953e-16,
+      "Odd polynomial, 3 terms": 4.5308963634691086e-05,
+      "Odd polynomial, 5 terms": 2.351916792595155e-09,
+      "MLP, 8 hidden units": 0.0022043704700602657,
+      "mlp_q25": 0.0012324383911094378,
+      "mlp_q75": 0.0032974463219659998,
+      "Frozen h^2 recurrence": 2.8864547487016206e-05,
+      "Frozen Aryabhata table": 0.00018926048346527182
+    },
+    {
+      "train_size": 12,
+      "test_size": 79,
+      "learned_alpha": 0.0003046533282516416,
+      "learned_alpha_2": 0.0003046096872175178,
+      "learned_delta0": 0.017452406437283477,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.0012235019635974745,
+      "Learned curvature (1 param)": 1.539450170239264e-05,
+      "Learned curvature and start (2 params)": 9.778570358506224e-16,
+      "Odd polynomial, 3 terms": 4.2140077627644316e-05,
+      "Odd polynomial, 5 terms": 2.1124173001096924e-09,
+      "MLP, 8 hidden units": 0.002191328018507082,
+      "mlp_q25": 0.0012182302034733031,
+      "mlp_q75": 0.002952664098532726,
+      "Frozen h^2 recurrence": 2.8865229605556765e-05,
+      "Frozen Aryabhata table": 0.0001954730818743552
+    },
+    {
+      "train_size": 18,
+      "test_size": 73,
+      "learned_alpha": 0.00030465478080389085,
+      "learned_alpha_2": 0.00030460968721752167,
+      "learned_delta0": 0.01745240643728352,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.0005515744149510471,
+      "Learned curvature (1 param)": 1.5323427276355538e-05,
+      "Learned curvature and start (2 params)": 2.0084770984871198e-16,
+      "Odd polynomial, 3 terms": 4.028693899904235e-05,
+      "Odd polynomial, 5 terms": 2.0603988872258367e-09,
+      "MLP, 8 hidden units": 0.0022134212589435477,
+      "mlp_q25": 0.0012997778057535988,
+      "mlp_q75": 0.002800006086604547,
+      "Frozen h^2 recurrence": 2.886288570701171e-05,
+      "Frozen Aryabhata table": 0.0001926371981720388
+    },
+    {
+      "train_size": 30,
+      "test_size": 61,
+      "learned_alpha": 0.0003046558288433601,
+      "learned_alpha_2": 0.00030460968721752145,
+      "learned_delta0": 0.01745240643728351,
+      "oracle_alpha": 0.00030460968721752167,
+      "oracle_delta0": 0.01745240643728351,
+      "Linear interpolation": 0.00021311837829462977,
+      "Learned curvature (1 param)": 1.522478533229167e-05,
+      "Learned curvature and start (2 params)": 9.555198162757494e-17,
+      "Odd polynomial, 3 terms": 3.865777806474139e-05,
+      "Odd polynomial, 5 terms": 1.9847546901181878e-09,
+      "MLP, 8 hidden units": 0.0026723838447371105,
+      "mlp_q25": 0.002012949491823023,
+      "mlp_q75": 0.003916061033875229,
+      "Frozen h^2 recurrence": 2.8861535121041358e-05,
+      "Frozen Aryabhata table": 0.00019021598630216216
+    }
+  ],
+  "extrapolation": {
+    "train_size": 13,
+    "test_size": 30,
+    "learned_alpha": 0.00030471487582293575,
+    "learned_alpha_2": 0.0003046096872175203,
+    "learned_delta0": 0.01745240643728351,
+    "oracle_alpha": 0.00030460968721752167,
+    "oracle_delta0": 0.01745240643728351,
+    "Linear interpolation": 0.09111292389673414,
+    "Learned curvature (1 param)": 6.412358134052868e-05,
+    "Learned curvature and start (2 params)": 6.661338147750939e-16,
+    "Odd polynomial, 3 terms": 0.0004902544945597572,
+    "Odd polynomial, 5 terms": 1.6108848420737233e-07,
+    "MLP, 8 hidden units": 0.03060899343248093,
+    "mlp_q25": 0.02717023899378458,
+    "mlp_q75": 0.03274475219757242,
+    "Frozen h^2 recurrence": 4.030883880433711e-05,
+    "Frozen Aryabhata table": 0.00024026450098782644,
+    "train_degrees": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60
+    ],
+    "protocol": "Train on 13 even degrees from 0 to 60. Test every degree from 61 to 90."
+  },
+  "pi": [
+    {
+      "name": "Aryabhata 62832/20000",
+      "source": "Ga\u1e47itapada 10, 499 CE",
+      "value": 3.1416,
+      "abs_error": 7.346410206832132e-06,
+      "circumference_error_on_diameter_20000": 0.1469282041362021,
+      "implied_radius_arcmin": 3437.7387318563788
+    },
+    {
+      "name": "Archimedes 22/7",
+      "source": "c. 250 BCE",
+      "value": 3.142857142857143,
+      "abs_error": 0.0012644892673496777,
+      "circumference_error_on_diameter_20000": 25.289785346991266,
+      "implied_radius_arcmin": 3436.3636363636365
+    },
+    {
+      "name": "Zu Chongzhi 355/113",
+      "source": "c. 480 CE",
+      "value": 3.1415929203539825,
+      "abs_error": 2.667641894049666e-07,
+      "circumference_error_on_diameter_20000": 0.005335283785825595,
+      "implied_radius_arcmin": 3437.746478873239
+    },
+    {
+      "name": "Aryabhata radius 3438",
+      "source": "round(21600 / (2 * 62832/20000))",
+      "value": 3438,
+      "abs_error": 0.25322921506040075,
+      "circumference_error_on_diameter_20000": null,
+      "implied_radius_arcmin": 3437.7387318563788
+    }
+  ],
+  "kuttaka": {
+    "trials": 400,
+    "mismatches": 0,
+    "mean_abs_division_gap": 0.0,
+    "example": {
+      "equation": "414*x + 189*y = 54",
+      "kuttaka": {
+        "x": -30,
+        "y": 66,
+        "divisions": 3
+      },
+      "extended_euclid": {
+        "x": -30,
+        "y": 66,
+        "divisions": 3
+      },
+      "kuttaka_checks": true,
+      "euclid_checks": true
+    },
+    "mean_seconds_60_digit": {
+      "kuttaka": 3.261146666773129e-05,
+      "extended_euclid": 2.988223332825631e-05
+    },
+    "note": "Same divisions, same gcd, both identities check out. Kuttaka is the extended Euclidean algorithm written as a quotient column."
+  },
+  "square_roots": [
+    {
+      "digits": 8,
+      "aryabhata_root_matches": true,
+      "newton_root_matches": true,
+      "aryabhata_digit_pair_steps": 4,
+      "aryabhata_digit_trials": 4,
+      "newton_iterations": 5,
+      "aryabhata_seconds": 9.214999863615958e-06,
+      "newton_seconds": 2.733999963311362e-06
+    },
+    {
+      "digits": 40,
+      "aryabhata_root_matches": true,
+      "newton_root_matches": true,
+      "aryabhata_digit_pair_steps": 20,
+      "aryabhata_digit_trials": 20,
+      "newton_iterations": 7,
+      "aryabhata_seconds": 1.3588999991043238e-05,
+      "newton_seconds": 3.54400003743649e-06
+    },
+    {
+      "digits": 200,
+      "aryabhata_root_matches": true,
+      "newton_root_matches": true,
+      "aryabhata_digit_pair_steps": 100,
+      "aryabhata_digit_trials": 100,
+      "newton_iterations": 10,
+      "aryabhata_seconds": 5.447300009109313e-05,
+      "newton_seconds": 6.686999995508813e-06
+    },
+    {
+      "digits": 800,
+      "aryabhata_root_matches": true,
+      "newton_root_matches": true,
+      "aryabhata_digit_pair_steps": 400,
+      "aryabhata_digit_trials": 400,
+      "newton_iterations": 11,
+      "aryabhata_seconds": 0.00025674399989839003,
+      "newton_seconds": 3.390000006220362e-05
+    }
+  ],
+  "sums": {
+    "checked_through_n": 500,
+    "closed_form_mismatches": {
+      "naturals": 0,
+      "squares": 0,
+      "cubes": 0
+    },
+    "closed_form_at_400": 21413400,
+    "learned_polynomials": {
+      "degree_2_trained_on_1_to_8": {
+        "prediction_at_400": 675187.1559633026,
+        "abs_error": 20738212.8440367,
+        "coefficients": [
+          -9.27981651376146,
+          4.243119266055045
+        ]
+      },
+      "degree_3_trained_on_1_to_8": {
+        "prediction_at_400": 21413399.99999993,
+        "abs_error": 7.078051567077637e-08,
+        "coefficients": [
+          0.16666666666663976,
+          0.5000000000000089,
+          0.3333333333333322
+        ]
+      }
+    },
+    "note": "The closed forms match the loops exactly, and they match the formulas still taught. A degree-2 fit cannot be the sum of squares. A degree-3 fit, given 8 examples, recovers it."
+  }
+}
