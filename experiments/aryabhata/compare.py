@@ -49,7 +49,7 @@ from experiments.aryabhata.jya import (
     small_angle_unit_sines,
 )
 from experiments.aryabhata.kuttaka import extended_euclid, kuttaka, solve
-from experiments.aryabhata.roots import aryabhata_isqrt, digit_trials, library_isqrt, newton_isqrt
+from experiments.aryabhata.roots import aryabhata_isqrt, library_isqrt, newton_isqrt
 from experiments.aryabhata.sums import (
     fit_sum_squares,
     loop_sum,
@@ -92,6 +92,38 @@ _COLORS = {
 def even_degrees(count: int, stop: int = 90) -> np.ndarray:
     raw = np.linspace(0, stop, count)
     return np.unique(np.rint(raw).astype(int))
+
+
+def _node_residuals(pred_unit: np.ndarray, true_rad: np.ndarray) -> dict[str, float]:
+    """Split a unit-sine residual into Rsine length and recovered angle.
+
+    max_rsine_length_arcmin is |pred - sin| * 3438. That is the half-chord
+    error in the arcminute unit of the table. max_angle_arcmin is
+    |arcsin(clip(pred)) - theta| in arcminutes of angle. They match near 0°
+    and diverge near 90°.
+    """
+    pred = np.asarray(pred_unit, dtype=float)
+    theta = np.asarray(true_rad, dtype=float)
+    length = np.abs(pred - np.sin(theta)) * RADIUS_ARCMINUTES
+    invertible = np.abs(pred) <= 1.0
+    length_at = int(np.argmax(length))
+    if np.any(invertible):
+        recovered = np.arcsin(np.clip(pred, -1.0, 1.0))
+        angle = np.abs(recovered - theta) * (180.0 / np.pi) * 60.0
+        angle = np.where(invertible, angle, -1.0)
+        angle_at = int(np.argmax(angle))
+        max_angle = float(angle[angle_at])
+        max_angle_deg = float(np.degrees(theta[angle_at]))
+    else:
+        max_angle = None
+        max_angle_deg = None
+    return {
+        "max_rsine_length_arcmin": float(length[length_at]),
+        "max_rsine_length_at_deg": float(np.degrees(theta[length_at])),
+        "max_angle_arcmin": max_angle,
+        "max_angle_at_deg": max_angle_deg,
+        "noninvertible": int(np.size(pred) - int(np.count_nonzero(invertible))),
+    }
 
 
 def _finite_mae(pred: np.ndarray, truth: np.ndarray) -> float:
@@ -171,9 +203,10 @@ def formula_report() -> list[dict]:
                 "stored_numbers": stored,
                 "node_mae": mae(node_pred, truth_node),
                 "node_max": max_abs(node_pred, truth_node),
-                "node_max_arcmin": max_abs(node_pred, truth_node) * RADIUS_ARCMINUTES,
+                **_node_residuals(node_pred, node_rad),
                 "grid_mae": mae(grid_pred, truth_grid),
                 "grid_max": max_abs(grid_pred, truth_grid),
+                **{f"grid_{key}": value for key, value in _node_residuals(grid_pred, grid_rad).items()},
                 "grid_note": grid_note,
                 "grid_deg": grid_deg,
                 "grid_error": np.abs(grid_pred - truth_grid),
@@ -209,9 +242,10 @@ def formula_report() -> list[dict]:
                 "stored_numbers": stored,
                 "node_mae": mae(node_pred, truth_node),
                 "node_max": max_abs(node_pred, truth_node),
-                "node_max_arcmin": max_abs(node_pred, truth_node) * RADIUS_ARCMINUTES,
+                **_node_residuals(node_pred, node_rad),
                 "grid_mae": mae(grid_pred, truth_grid),
                 "grid_max": max_abs(grid_pred, truth_grid),
+                **{f"grid_{key}": value for key, value in _node_residuals(grid_pred, grid_rad).items()},
                 "grid_note": "Evaluated at each angle. No table interpolation.",
                 "grid_deg": grid_deg,
                 "grid_error": np.abs(grid_pred - truth_grid),
@@ -383,30 +417,57 @@ def kuttaka_report(trials: int = 400) -> dict:
     }
 
 
-def sqrt_report() -> list[dict]:
+def _median_seconds(fn, n: int, repeats: int) -> float:
+    samples = []
+    for _ in range(repeats):
+        start = time.perf_counter()
+        fn(n)
+        samples.append(time.perf_counter() - start)
+    samples.sort()
+    return samples[len(samples) // 2]
+
+
+def sqrt_report() -> dict:
+    """Cost of two exact integer square roots. The roots match, so no model is trained."""
+    rng = random.Random(0)
+    repeats = {8: 80, 40: 30, 200: 12, 800: 5}
     rows = []
     for digits in (8, 40, 200, 800):
-        n = int("9" * digits)
-        start = time.perf_counter()
-        root_a, steps_a = aryabhata_isqrt(n)
-        seconds_a = time.perf_counter() - start
-        start = time.perf_counter()
-        root_n, steps_n = newton_isqrt(n)
-        seconds_n = time.perf_counter() - start
-        root_lib = library_isqrt(n)
-        rows.append(
-            {
-                "digits": digits,
-                "aryabhata_root_matches": root_a == root_lib,
-                "newton_root_matches": root_n == root_lib,
-                "aryabhata_digit_pair_steps": steps_a,
-                "aryabhata_digit_trials": digit_trials(n),
-                "newton_iterations": steps_n,
-                "aryabhata_seconds": seconds_a,
-                "newton_seconds": seconds_n,
-            }
-        )
-    return rows
+        for kind, n in (
+            ("nines", int("9" * digits)),
+            ("random", rng.randrange(10 ** (digits - 1), 10**digits)),
+        ):
+            old = aryabhata_isqrt(n)
+            modern = newton_isqrt(n)
+            library = library_isqrt(n)
+            rows.append(
+                {
+                    "digits": digits,
+                    "kind": kind,
+                    "input_bits": n.bit_length(),
+                    "roots_identical": old.root == modern.root == library,
+                    "aryabhata_digit_pair_steps": old.steps,
+                    "aryabhata_digit_trials": old.digit_trials,
+                    "aryabhata_max_operand_bits": old.max_operand_bits,
+                    "aryabhata_median_operand_bits": old.median_operand_bits,
+                    "aryabhata_median_seconds": _median_seconds(aryabhata_isqrt, n, repeats[digits]),
+                    "newton_iterations": modern.steps,
+                    "newton_max_operand_bits": modern.max_operand_bits,
+                    "newton_median_operand_bits": modern.median_operand_bits,
+                    "newton_median_seconds": _median_seconds(newton_isqrt, n, repeats[digits]),
+                }
+            )
+    return {
+        "rows": rows,
+        "note": (
+            "Both algorithms return math.isqrt exactly, on strings of nines and on "
+            "random integers. A model trained on the root would see the same label "
+            "either way, so none is trained here. The difference is wall time and "
+            "the bit length of the operands. Newton divides the full integer on "
+            "every iteration. The digit method's operands grow one pair at a time, "
+            "and each pair tries candidate digits from 9 downward."
+        ),
+    }
 
 
 def sums_report() -> dict:
@@ -563,6 +624,24 @@ def build_summary(mlp_seeds: int = MLP_SEEDS, mlp_steps: int = MLP_STEPS, kuttak
     sums = sums_report()
     summary = {
         "ground_truth": "math.sin, math.pi, math.isqrt",
+        "error_definitions": {
+            "max_rsine_length_arcmin": (
+                "Absolute error in the Rsine length, |prediction - sin(theta)| * 3438. "
+                "The table's unit is an arcminute of length along the radius, not an angle."
+            ),
+            "max_angle_arcmin": (
+                "Absolute error in the recovered angle, |arcsin(clip(prediction)) - theta| "
+                "converted to arcminutes. This is the angular error."
+            ),
+            "learning_mae": (
+                "Mean |prediction - sin(theta)| on held-out degrees. Dimensionless. "
+                "Not an arcminute error."
+            ),
+            "model_families": (
+                "The fitted second-difference recurrence and a table-residual model "
+                "are different families. Their errors are not one ranking."
+            ),
+        },
         "native_step_degrees": 3.75,
         "radius_arcminutes": RADIUS_ARCMINUTES,
         "radius_from_his_pi": radius_from_pi(),
@@ -607,7 +686,9 @@ def main() -> None:
     print(f"wrote {paths['summary']}")
     for row in summary["sine_formulas"]:
         print(
-            f"{row['name']:<32} node max {row['node_max_arcmin']:.4f} arcmin   "
+            f"{row['name']:<32} Rsine {row['max_rsine_length_arcmin']:.4f} length-arcmin   "
+            f"angle {row['max_angle_arcmin']} arcmin "
+            f"({row['noninvertible']} not invertible)   "
             f"grid mae {row['grid_mae']:.3e}"
         )
     print("sample efficiency (test MAE):")

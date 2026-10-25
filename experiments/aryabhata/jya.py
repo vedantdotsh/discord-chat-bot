@@ -65,6 +65,30 @@ def radius_from_pi(pi: float | None = None) -> float:
     return 21600 / (2 * (aryabhata_pi() if pi is None else pi))
 
 
+def rsine_length_arcmin(pred_unit: float, true_unit: float, radius: float = RADIUS_ARCMINUTES) -> float:
+    """Error in the Rsine length, in the arcminute unit the table is written in.
+
+    jya is a length, R*sin(theta), not an angle. A residual of 1 here means
+    the half-chord is one arcminute of length short or long on a radius of
+    `radius`. It is not automatically an error of one arcminute of angle.
+    """
+    return abs(pred_unit - true_unit) * radius
+
+
+def angle_error_arcmin(pred_unit: float, true_radians: float) -> float:
+    """Error in the recovered angle, in arcminutes of angle.
+
+    The predicted unit sine is inverted with arcsin. A prediction outside
+    [-1, 1] is not an angle, and this function rejects it instead of clipping
+    it to 90 degrees. Near 0 degrees this matches the Rsine-length residual.
+    Near 90 degrees cosine is small, so the same length residual is a larger
+    angle residual.
+    """
+    if pred_unit < -1.0 or pred_unit > 1.0:
+        raise ValueError("prediction is outside [-1, 1], so it is not an angle")
+    return abs(math.asin(pred_unit) - true_radians) * (180.0 / math.pi) * 60.0
+
+
 def published_jya() -> list[int]:
     """Cumulative Rsines in arcminutes. The last entry is the radius, 3438."""
     total = 0

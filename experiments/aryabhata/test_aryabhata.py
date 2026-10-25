@@ -20,6 +20,7 @@ from experiments.aryabhata.approx import (
 from experiments.aryabhata.jya import (
     JYA_DIFFERENCES,
     RADIUS_ARCMINUTES,
+    angle_error_arcmin,
     aryabhata_pi,
     modern_jya,
     modern_rounded_jya,
@@ -28,6 +29,7 @@ from experiments.aryabhata.jya import (
     published_jya,
     radius_from_pi,
     rollout,
+    rsine_length_arcmin,
 )
 from experiments.aryabhata.kuttaka import extended_euclid, kuttaka, solve
 from experiments.aryabhata.roots import aryabhata_isqrt, newton_isqrt
@@ -50,10 +52,26 @@ class JyaTests(unittest.TestCase):
         self.assertEqual((100 + 4) * 8 + 62000, 62832)
         self.assertEqual(round(radius_from_pi()), RADIUS_ARCMINUTES)
 
-    def test_printed_table_is_within_an_arcminute(self):
+    def test_printed_table_rsine_length_is_within_one_arcminute(self):
+        # Residual in the table's own length unit, not the recovered angle.
         truth = modern_jya()
-        worst = max(abs(pred - got) for pred, got in zip(published_jya(), truth))
+        worst = max(
+            rsine_length_arcmin(pred / RADIUS_ARCMINUTES, got / RADIUS_ARCMINUTES)
+            for pred, got in zip(published_jya(), truth)
+        )
         self.assertLess(worst, 1.0)
+
+    def test_length_residual_is_not_the_angle_error(self):
+        theta = math.radians(60)
+        true_unit = math.sin(theta)
+        pred = true_unit + 1.0 / RADIUS_ARCMINUTES
+        self.assertAlmostEqual(rsine_length_arcmin(pred, true_unit), 1.0, places=6)
+        # cos(60 deg) = 1/2, so one arcminute of Rsine is about two of angle.
+        self.assertAlmostEqual(angle_error_arcmin(pred, theta), 2.0, delta=0.02)
+        small = 1.0 / RADIUS_ARCMINUTES
+        self.assertAlmostEqual(angle_error_arcmin(small, 0.0), 1.0, delta=0.01)
+        with self.assertRaises(ValueError):
+            angle_error_arcmin(1.01, math.pi / 2)
 
     def test_same_size_modern_table_rounds_within_half_an_arcminute(self):
         truth = modern_jya()
@@ -116,16 +134,21 @@ class RootTests(unittest.TestCase):
     def test_matches_library(self):
         samples = [0, 1, 2, 3, 10, 99, 100, 10**6, 10**12 + 12345, int("9" * 60)]
         for n in samples:
-            root, _steps = aryabhata_isqrt(n)
-            newton, _iters = newton_isqrt(n)
-            self.assertEqual(root, math.isqrt(n))
-            self.assertEqual(newton, math.isqrt(n))
+            old = aryabhata_isqrt(n)
+            newton = newton_isqrt(n)
+            self.assertEqual(old.root, math.isqrt(n))
+            self.assertEqual(newton.root, math.isqrt(n))
+            self.assertGreaterEqual(old.max_operand_bits, 0)
+            self.assertGreaterEqual(newton.max_operand_bits, n.bit_length() if n else 0)
 
     def test_newton_uses_fewer_iterations_on_a_long_integer(self):
         n = int("9" * 200)
-        _root, pairs = aryabhata_isqrt(n)
-        _newton, iterations = newton_isqrt(n)
-        self.assertGreater(pairs, iterations)
+        old = aryabhata_isqrt(n)
+        newton = newton_isqrt(n)
+        self.assertGreater(old.steps, newton.steps)
+        # Newton divides the full integer. The digit method's median operand is smaller.
+        self.assertGreater(newton.median_operand_bits, old.median_operand_bits)
+        self.assertGreater(old.digit_trials, 0)
 
 
 class SumTests(unittest.TestCase):

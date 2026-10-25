@@ -21,7 +21,8 @@ Plots and `summary.json` land in `experiments/aryabhata/results/`.
 - **Extrapolation.** The same learners, trained only up to 60°, scored from 61° to 90°.
 - **Pi.** `62832/20000` against `22/7`, `355/113`, and `math.pi`, on a circle of diameter 20000 (his own statement of the verse).
 - **Kuttaka.** The quotient column against the extended Euclidean algorithm, on the worked example `414x + 189y = 54` and on random pairs.
-- **Square roots.** Digit pairs against integer Newton, both checked with `math.isqrt`.
+- **Square roots.** Digit pairs against integer Newton, both checked with `math.isqrt`. Both are exact, so the report is wall time and operand bit length, not a trained model.
+- **Error units.** `max_rsine_length_arcmin` is the half-chord residual in the table's length unit. `max_angle_arcmin` is the recovered angle, `|arcsin(prediction) - theta|` in arcminutes. Learning MAE is dimensionless `|prediction - sin|`. The fitted recurrence and a table-residual model are separate families and are not ranked together.
 - **Sums.** His closed forms against direct loops, then a polynomial fit that has to rediscover the sum of squares.
 
 ## Adding a theory
